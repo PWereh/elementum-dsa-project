@@ -39,6 +39,7 @@ setup(
             "mypy>=1.3.0",
             "flake8>=6.0.0",
             "isort>=5.12.0",
+            "jsonschema>=4.17.3"
         ],
         "docs": [
             "mkdocs>=1.4.3",
@@ -51,7 +52,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "elementum-dsa=app:main",
+            "elementum-dsa=cli:main",
         ],
     },
 )
