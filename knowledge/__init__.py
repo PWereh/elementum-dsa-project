@@ -1,3 +1,3 @@
-"""Knowledge base implementations for Elementum DSA framework."""
+"""Knowledge base implementations for the Elementum DSA framework."""
 
-__all__ = ["templates", "schemas"]
+__all__ = []

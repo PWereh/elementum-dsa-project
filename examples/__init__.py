@@ -1,3 +1,3 @@
-"""Example implementations for Elementum DSA framework."""
+"""Example implementations for the Elementum DSA framework."""
 
-__all__ = ["powerpoint", "data_analysis"]
+__all__ = []

@@ -1,3 +1,21 @@
-"""Core package for Elementum DSA framework."""
+"""Core components for the Elementum DSA framework."""
 
-__all__ = ["agent", "knowledge", "protocols", "governance", "monitoring", "mca"]
+from core.agent import Agent
+from core.knowledge import KnowledgeBase
+from core.protocols import Protocol, DirectProtocol, CollaborativeProtocol
+from core.governance import GovernanceEngine, GovernanceRule
+from core.monitoring import MonitoringSystem, PerformanceMetric
+from core.mca import MasterControlAgent
+
+__all__ = [
+    'Agent',
+    'KnowledgeBase',
+    'Protocol',
+    'DirectProtocol',
+    'CollaborativeProtocol',
+    'GovernanceEngine',
+    'GovernanceRule',
+    'MonitoringSystem',
+    'PerformanceMetric',
+    'MasterControlAgent',
+]

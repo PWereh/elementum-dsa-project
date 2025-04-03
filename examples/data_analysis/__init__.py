@@ -1,3 +1,9 @@
-"""Data analysis agent example for Elementum DSA framework."""
+"""Data Analysis agent example implementation."""
 
-__all__ = ["data_analysis_agent", "data_analysis_knowledge"]
+from examples.data_analysis.data_analysis_agent import DataAnalysisAgent
+from examples.data_analysis.data_analysis_knowledge import DataAnalysisKnowledgeBase
+
+__all__ = [
+    'DataAnalysisAgent',
+    'DataAnalysisKnowledgeBase',
+]

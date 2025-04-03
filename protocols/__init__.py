@@ -1,3 +1,3 @@
-"""Protocol implementations for Elementum DSA framework."""
+"""Communication protocols for the Elementum DSA framework."""
 
 __all__ = []

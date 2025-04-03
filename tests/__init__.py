@@ -1,3 +1,3 @@
-"""Test suite for Elementum DSA framework."""
+"""Test suite for the Elementum DSA framework."""
 
-__all__ = ["unit"]
+__all__ = []

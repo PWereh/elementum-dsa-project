@@ -1,3 +1,5 @@
-"""Agent templates for Elementum DSA framework."""
+"""Templates for creating domain-specific agents."""
 
-__all__ = ["dsa_template"]
+from agents.templates.dsa_template import DomainSpecificAgent
+
+__all__ = ['DomainSpecificAgent']

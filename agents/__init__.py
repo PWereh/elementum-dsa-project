@@ -1,3 +1,3 @@
-"""Agent implementations for Elementum DSA framework."""
+"""Agent implementations for the Elementum DSA framework."""
 
-__all__ = ["templates"]
+__all__ = []

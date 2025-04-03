@@ -1,3 +1,5 @@
-"""Knowledge base templates for Elementum DSA framework."""
+"""Templates for creating domain-specific knowledge bases."""
 
-__all__ = ["knowledge_template"]
+from knowledge.templates.knowledge_template import DomainKnowledgeBase
+
+__all__ = ['DomainKnowledgeBase']

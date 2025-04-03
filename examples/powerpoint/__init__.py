@@ -1,3 +1,9 @@
-"""PowerPoint agent example for Elementum DSA framework."""
+"""PowerPoint agent example implementation."""
 
-__all__ = ["powerpoint_agent", "powerpoint_knowledge"]
+from examples.powerpoint.powerpoint_agent import PowerPointAgent
+from examples.powerpoint.powerpoint_knowledge import PowerPointKnowledgeBase
+
+__all__ = [
+    'PowerPointAgent',
+    'PowerPointKnowledgeBase',
+]
