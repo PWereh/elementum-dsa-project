@@ -11,7 +11,7 @@ from core.monitoring import MonitoringSystem
 from core.protocols import DirectProtocol, CollaborativeProtocol
 from core.errors import AgentException, format_error_response
 
-logger = logging.getLogger("elementum_dsa.mca")
+logger = logging.getLogger(__name__)
 
 class MasterControlAgent:
     """Master Control Agent for managing domain-specific agents."""
@@ -19,7 +19,6 @@ class MasterControlAgent:
     def __init__(self):
         """Initialize a new MasterControlAgent instance."""
         self.agents = {}
-        self.domain_agents = {}
         self.governance = GovernanceEngine()
         self.monitoring = MonitoringSystem()
         self.direct_protocol = DirectProtocol()
@@ -32,12 +31,6 @@ class MasterControlAgent:
             agent: The agent to register
         """
         self.agents[agent.agent_id] = agent
-        
-        # Also track by domain for easy lookup
-        if agent.domain not in self.domain_agents:
-            self.domain_agents[agent.domain] = []
-        self.domain_agents[agent.domain].append(agent.agent_id)
-        
         logger.info(f"Registered agent: {agent}")
 
     def unregister_agent(self, agent_id: str):
@@ -48,18 +41,9 @@ class MasterControlAgent:
         """
         if agent_id in self.agents:
             agent = self.agents.pop(agent_id)
-            
-            # Also remove from domain lookup
-            if agent.domain in self.domain_agents:
-                if agent_id in self.domain_agents[agent.domain]:
-                    self.domain_agents[agent.domain].remove(agent_id)
-                    # Clean up empty domain entries
-                    if not self.domain_agents[agent.domain]:
-                        del self.domain_agents[agent.domain]
-            
             logger.info(f"Unregistered agent: {agent}")
         else:
-            logger.warning(f"Agent not found for unregistration: {agent_id}")
+            logger.warning(f"Agent not found: {agent_id}")
 
     def get_agent(self, agent_id: str) -> Optional[Agent]:
         """Get a registered agent by ID.
@@ -81,14 +65,8 @@ class MasterControlAgent:
         Returns:
             List of matching agents
         """
-        agents = []
-        if domain in self.domain_agents:
-            for agent_id in self.domain_agents[domain]:
-                agent = self.get_agent(agent_id)
-                if agent:
-                    agents.append(agent)
-        return agents
-    
+        return [agent for agent in self.agents.values() if agent.domain == domain]
+
     def determine_agent(self, query: str, domain: str = None) -> Optional[str]:
         """Determine the appropriate agent for a query.
 
@@ -97,28 +75,45 @@ class MasterControlAgent:
             domain: Optional domain to filter by
 
         Returns:
-            ID of the appropriate agent or None if not found
+            Agent ID or None if no appropriate agent found
         """
-        # If domain is specified, use it to find an agent
-        if domain:
-            domain_agents = self.get_agents_by_domain(domain)
-            if domain_agents:
-                # Return the first agent for the domain
-                return domain_agents[0].agent_id
-        
-        # If no domain is specified or no agents found for domain,
-        # try to determine the appropriate agent based on the query
-        # This is a simple implementation - in a real system, this would use
-        # more sophisticated NLP techniques to analyze the query
-        
-        # Look for domain-specific keywords in the query
-        for domain_name, agent_ids in self.domain_agents.items():
-            if domain_name.lower() in query.lower():
-                if agent_ids:
-                    return agent_ids[0]
-        
-        # If no match found, return None
-        return None
+        try:
+            # If domain is specified, use the first agent for that domain
+            if domain:
+                domain_agents = self.get_agents_by_domain(domain)
+                if domain_agents:
+                    return domain_agents[0].agent_id
+                logger.warning(f"No agents found for domain: {domain}")
+                return None
+
+            # Simple keyword-based agent selection
+            # In a real implementation, this would use NLP or more sophisticated matching
+            keywords = {
+                "presentation": "presentation_development",
+                "slide": "presentation_development",
+                "powerpoint": "presentation_development",
+                "data": "data_analysis",
+                "analysis": "data_analysis",
+                "statistics": "data_analysis",
+                "visualization": "data_analysis"
+            }
+
+            # Check for keyword matches
+            for keyword, match_domain in keywords.items():
+                if keyword.lower() in query.lower():
+                    domain_agents = self.get_agents_by_domain(match_domain)
+                    if domain_agents:
+                        return domain_agents[0].agent_id
+
+            # If no matches, use the first available agent
+            if self.agents:
+                return next(iter(self.agents.keys()))
+
+            logger.warning("No appropriate agent found for query")
+            return None
+        except Exception as e:
+            logger.exception(f"Error determining agent: {str(e)}")
+            return None
 
     def process_query(self, query: str, agent_id: str = None, domain: str = None, context: Dict[str, Any] = None) -> Dict[str, Any]:
         """Process a query using a registered agent.
@@ -141,10 +136,9 @@ class MasterControlAgent:
             if agent_id:
                 agent = self.get_agent(agent_id)
                 if not agent:
-                    error_msg = f"Agent not found: {agent_id}"
-                    logger.error(error_msg)
+                    logger.error(f"Agent not found: {agent_id}")
                     return format_error_response(
-                        AgentException(error_msg, agent_id=agent_id),
+                        AgentException(f"Agent not found: {agent_id}"),
                         agent_id=agent_id,
                         query=query
                     )
@@ -154,23 +148,21 @@ class MasterControlAgent:
                     # Use the first agent for the domain
                     agent = domain_agents[0]
                 else:
-                    error_msg = f"No agents found for domain: {domain}"
-                    logger.error(error_msg)
+                    logger.error(f"No agents found for domain: {domain}")
                     return format_error_response(
-                        AgentException(error_msg, domain=domain),
+                        AgentException(f"No agents found for domain: {domain}"),
                         domain=domain,
                         query=query
                     )
             else:
-                # Try to determine the appropriate agent
+                # Determine the appropriate agent
                 determined_agent_id = self.determine_agent(query)
                 if determined_agent_id:
                     agent = self.get_agent(determined_agent_id)
                 else:
-                    error_msg = "Could not determine an appropriate agent. Please specify agent_id or domain."
-                    logger.error(error_msg)
+                    logger.error("Could not determine an appropriate agent and none specified")
                     return format_error_response(
-                        AgentException(error_msg),
+                        AgentException("Could not determine an appropriate agent and none specified"),
                         query=query
                     )
 
@@ -183,15 +175,11 @@ class MasterControlAgent:
             governance_result = self.governance.enforce(governance_context)
 
             if governance_result["action"] == "block":
-                error_msg = governance_result["message"]
-                logger.warning(f"Query blocked by governance: {error_msg}")
+                logger.warning(f"Query blocked by governance rules: {governance_result['message']}")
                 return {
-                    "error": error_msg,
+                    "error": governance_result["message"],
                     "violations": governance_result["violations"],
-                    "status": "blocked",
-                    "agent_id": agent.agent_id,
-                    "domain": agent.domain,
-                    "query": query
+                    "status": "blocked"
                 }
 
             # Process query with timing
@@ -226,13 +214,12 @@ class MasterControlAgent:
                 }
 
             return protocol_result
-            
         except Exception as e:
             logger.exception(f"Error processing query: {str(e)}")
             return format_error_response(
                 e,
-                agent_id=agent_id,
-                domain=domain,
+                agent_id=agent_id if agent_id else None,
+                domain=domain if domain else None,
                 query=query
             )
 
@@ -255,10 +242,9 @@ class MasterControlAgent:
             # Get primary agent
             primary_agent = self.get_agent(primary_agent_id)
             if not primary_agent:
-                error_msg = f"Primary agent not found: {primary_agent_id}"
-                logger.error(error_msg)
+                logger.error(f"Primary agent not found: {primary_agent_id}")
                 return format_error_response(
-                    AgentException(error_msg, agent_id=primary_agent_id),
+                    AgentException(f"Primary agent not found: {primary_agent_id}"),
                     agent_id=primary_agent_id,
                     query=query
                 )
@@ -274,10 +260,9 @@ class MasterControlAgent:
                     missing_agents.append(agent_id)
 
             if missing_agents:
-                error_msg = f"Support agents not found: {', '.join(missing_agents)}"
-                logger.error(error_msg)
+                logger.error(f"Support agents not found: {', '.join(missing_agents)}")
                 return format_error_response(
-                    AgentException(error_msg),
+                    AgentException(f"Support agents not found: {', '.join(missing_agents)}"),
                     agent_id=primary_agent_id,
                     query=query
                 )
@@ -299,13 +284,11 @@ class MasterControlAgent:
             # Check for blocked agents
             blocked_agents = [result for result in governance_results if result["result"]["action"] == "block"]
             if blocked_agents:
-                error_msg = "Collaboration blocked due to governance violations"
-                logger.warning(f"{error_msg}: {blocked_agents}")
+                logger.warning(f"Collaboration blocked due to governance violations: {blocked_agents}")
                 return {
-                    "error": error_msg,
+                    "error": "Collaboration blocked due to governance violations",
                     "blocked_agents": blocked_agents,
-                    "status": "blocked",
-                    "query": query
+                    "status": "blocked"
                 }
 
             # Process collaborative query with timing
@@ -342,7 +325,6 @@ class MasterControlAgent:
                 }
 
             return protocol_result
-            
         except Exception as e:
             logger.exception(f"Error in collaboration: {str(e)}")
             return format_error_response(
