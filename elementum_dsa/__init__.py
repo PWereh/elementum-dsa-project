@@ -1,7 +1,4 @@
-"""Elementum Domain-Specific Agent (DSA) Governance Framework.
+"""Elementum Domain-Specific Agent (DSA) Governance Framework."""
 
-A comprehensive framework for developing, deploying, and managing
-domain-specific AI agents.
-"""
-
-__version__ = "1.0.0"
+__version__ = '1.0.0'
+__all__ = []

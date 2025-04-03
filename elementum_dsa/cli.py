@@ -1,14 +1,14 @@
-"""Command line interface for Elementum DSA.
-"""
+"""Command-line interface for the Elementum DSA framework."""
 
 import argparse
 import json
 import logging
 from typing import Dict, Any, List
+import sys
 
-from elementum_dsa.core.mca import MasterControlAgent
-from elementum_dsa.examples.powerpoint.powerpoint_agent import PowerPointAgent
-from elementum_dsa.examples.data_analysis.data_analysis_agent import DataAnalysisAgent
+from core.mca import MasterControlAgent
+from examples.powerpoint.powerpoint_agent import PowerPointAgent
+from examples.data_analysis.data_analysis_agent import DataAnalysisAgent
 
 
 # Configure logging
@@ -158,7 +158,7 @@ def save_responses(responses: List[Dict[str, Any]], output_file: str):
 
 
 def main():
-    """Main application entry point."""
+    """Main CLI entry point."""
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Elementum DSA Application")
     parser.add_argument("--query", type=str, help="Query to process")
@@ -172,23 +172,28 @@ def main():
     # Set logging level
     logging.getLogger().setLevel(getattr(logging, args.log_level.upper()))
 
-    # Create and initialize the Master Control Agent
-    mca = create_mca()
+    try:
+        # Create and initialize the Master Control Agent
+        mca = create_mca()
 
-    # Process query file if specified
-    if args.query_file:
-        responses = process_query_file(mca, args.query_file)
-        if args.output_file:
-            save_responses(responses, args.output_file)
+        # Process query file if specified
+        if args.query_file:
+            responses = process_query_file(mca, args.query_file)
+            if args.output_file:
+                save_responses(responses, args.output_file)
+            else:
+                print(json.dumps(responses, indent=2))
+        # Process single query if specified
+        elif args.query:
+            response = process_query(mca, args.query, args.agent_id, args.domain)
+            print(json.dumps(response, indent=2))
+        # Display usage information if no query specified
         else:
-            print(json.dumps(responses, indent=2))
-    # Process single query if specified
-    elif args.query:
-        response = process_query(mca, args.query, args.agent_id, args.domain)
-        print(json.dumps(response, indent=2))
-    # Display usage information if no query specified
-    else:
-        parser.print_help()
+            parser.print_help()
+    except Exception as e:
+        logger.exception(f"Error: {str(e)}")
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
