@@ -1,0 +1,35 @@
+[
+  {
+    "query": "Generate presentation structure for technical overview",
+    "domain": "presentation_development"
+  },
+  {
+    "query": "Provide slide design guidelines for executive presentation",
+    "domain": "presentation_development"
+  },
+  {
+    "query": "Give me delivery guidelines for a sales pitch",
+    "domain": "presentation_development"
+  },
+  {
+    "query": "Clean and preprocess my dataset",
+    "domain": "data_analysis"
+  },
+  {
+    "query": "Perform statistical analysis on sales data",
+    "domain": "data_analysis"
+  },
+  {
+    "query": "Visualize customer demographics",
+    "domain": "data_analysis"
+  },
+  {
+    "query": "Generate a comprehensive analysis report",
+    "domain": "data_analysis"
+  },
+  {
+    "query": "Create a presentation with statistical analysis",
+    "primary_agent_id": "Elementum-DSA-PRESENTATION_DEVELOPMENT-AGENT-V1.0",
+    "support_agent_ids": ["Elementum-DSA-DATA_ANALYSIS-AGENT-V1.0"]
+  }
+]

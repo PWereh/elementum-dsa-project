@@ -1,0 +1,212 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Knowledge Base Schema",
+  "description": "Schema for domain-specific knowledge base definitions",
+  "type": "object",
+  "required": ["knowledge_id", "domain", "version", "core_knowledge", "rules", "best_practices", "validation", "integration"],
+  "properties": {
+    "knowledge_id": {
+      "type": "string",
+      "description": "Unique identifier for the knowledge base",
+      "pattern": "^Elementum-DSA-[A-Z]+-KNOWLEDGE-V\\d+(\\.\\d+)?$"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Domain specialization"
+    },
+    "version": {
+      "type": "number",
+      "description": "Knowledge base version",
+      "minimum": 0
+    },
+    "core_knowledge": {
+      "type": "object",
+      "description": "Core domain knowledge",
+      "required": ["concepts", "terminology", "principles"],
+      "properties": {
+        "concepts": {
+          "type": "object",
+          "description": "Domain concepts",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "terminology": {
+          "type": "object",
+          "description": "Domain terminology",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "principles": {
+          "type": "object",
+          "description": "Domain principles",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "description": "Domain-specific rules",
+      "required": ["constraints", "requirements", "guidelines"],
+      "properties": {
+        "constraints": {
+          "type": "object",
+          "description": "Domain constraints",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "requirements": {
+          "type": "object",
+          "description": "Domain requirements",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "guidelines": {
+          "type": "object",
+          "description": "Domain guidelines",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "best_practices": {
+      "type": "object",
+      "description": "Best practices and guidelines",
+      "required": ["recommended", "optional", "discouraged"],
+      "properties": {
+        "recommended": {
+          "type": "object",
+          "description": "Recommended practices",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "optional": {
+          "type": "object",
+          "description": "Optional practices",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "discouraged": {
+          "type": "object",
+          "description": "Discouraged practices",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation rules",
+      "required": ["input", "process", "output"],
+      "properties": {
+        "input": {
+          "type": "object",
+          "description": "Input validation rules",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "process": {
+          "type": "object",
+          "description": "Process validation rules",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "output": {
+          "type": "object",
+          "description": "Output validation rules",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "description": "Integration points",
+      "required": ["apis", "services", "data_sources"],
+      "properties": {
+        "apis": {
+          "type": "object",
+          "description": "API integration points",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "services": {
+          "type": "object",
+          "description": "Service integration points",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "data_sources": {
+          "type": "object",
+          "description": "Data source integration points",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {
+        "author": {
+          "type": "string",
+          "description": "Knowledge base author"
+        },
+        "created": {
+          "type": "string",
+          "description": "Creation date",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "description": "Last update date",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string",
+          "description": "Knowledge base description"
+        },
+        "version_history": {
+          "type": "object",
+          "description": "Version history",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "release_date": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "changes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "compatible_agents": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
