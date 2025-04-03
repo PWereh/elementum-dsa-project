@@ -52,7 +52,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "elementum-dsa=cli:main",
+            "elementum-dsa=elementum_dsa.cli:main",
         ],
     },
 )
