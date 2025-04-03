@@ -2,6 +2,74 @@
 
 > Master framework for developing specialized AI agents with domain supremacy
 
+## Framework Architecture
+
+```mermaid
+graph TD
+    %% Core Components
+    MCA[Master Control Agent] --> |manages| DSA[Domain-Specific Agents]
+    MCA --> |enforces| GOV[Governance Engine]
+    MCA --> |measures| MON[Monitoring System]
+    MCA --> |implements| PROT[Interaction Protocols]
+    
+    %% Agent Structure
+    DSA --> |instantiates| POWER[PowerPoint Agent]
+    DSA --> |instantiates| DATA[Data Analysis Agent]
+    DSA --> |instantiates| CUSTOM[Custom Agents...]
+    
+    %% Knowledge Base
+    KB[Knowledge Base] --> |provides| CORE[Core Knowledge]
+    KB --> |provides| RULES[Domain Rules]
+    KB --> |provides| BP[Best Practices]
+    KB --> |provides| VAL[Validation Rules]
+    KB --> |provides| INT[Integration Points]
+    
+    %% Agent Connection to Knowledge
+    POWER --> |utilizes| KB
+    DATA --> |utilizes| KB
+    CUSTOM --> |utilizes| KB
+    
+    %% Protocols
+    PROT --> |implements| DIR[Direct Protocol]
+    PROT --> |implements| COL[Collaborative Protocol]
+    PROT --> |implements| MED[Mediated Protocol]
+    
+    %% User Interaction
+    USER[Human User] --> |queries| CLI[CLI Interface]
+    USER --> |queries| API[API Interface]
+    
+    %% Interface to MCA
+    CLI --> |routes to| MCA
+    API --> |routes to| MCA
+    
+    %% Governance Components
+    GOV --> |applies| BOUND[Domain Boundaries]
+    GOV --> |applies| SAFE[Safety Rules]
+    GOV --> |applies| COMP[Compliance Checks]
+    
+    %% Monitoring Components
+    MON --> |tracks| PERF[Performance Metrics]
+    MON --> |tracks| ACC[Accuracy Metrics]
+    MON --> |tracks| USAGE[Usage Patterns]
+    
+    %% Styling
+    classDef core fill:#f9f,stroke:#333,stroke-width:2px
+    classDef agent fill:#bbf,stroke:#333,stroke-width:1px
+    classDef knowledge fill:#bfb,stroke:#333,stroke-width:1px
+    classDef protocol fill:#fbb,stroke:#333,stroke-width:1px
+    classDef interface fill:#bff,stroke:#333,stroke-width:1px
+    classDef governance fill:#ffb,stroke:#333,stroke-width:1px
+    classDef monitoring fill:#fbf,stroke:#333,stroke-width:1px
+    
+    class MCA core
+    class DSA,POWER,DATA,CUSTOM agent
+    class KB,CORE,RULES,BP,VAL,INT knowledge
+    class PROT,DIR,COL,MED protocol
+    class CLI,API interface
+    class GOV,BOUND,SAFE,COMP governance
+    class MON,PERF,ACC,USAGE monitoring
+```
+
 ## Overview
 
 Elementum DSA is a comprehensive framework for creating, deploying, and managing domain-specific AI agents that excel in targeted knowledge domains. The framework enforces robust knowledge structures, standardized interaction protocols, and strict governance policies.
