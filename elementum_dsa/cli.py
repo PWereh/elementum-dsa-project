@@ -3,8 +3,9 @@
 import argparse
 import json
 import logging
-from typing import Dict, Any, List
+import os
 import sys
+from typing import Dict, Any, List
 
 from core.mca import MasterControlAgent
 from examples.powerpoint.powerpoint_agent import PowerPointAgent
@@ -102,10 +103,17 @@ def load_query_file(file_path: str) -> List[Dict[str, Any]]:
         List of query objects
     """
     logger.info(f"Loading queries from file: {file_path}")
-    with open(file_path, "r") as f:
-        queries = json.load(f)
-    logger.info(f"Loaded {len(queries)} queries")
-    return queries
+    try:
+        with open(file_path, "r") as f:
+            queries = json.load(f)
+        logger.info(f"Loaded {len(queries)} queries")
+        return queries
+    except FileNotFoundError:
+        logger.error(f"Query file not found: {file_path}")
+        sys.exit(1)
+    except json.JSONDecodeError:
+        logger.error(f"Invalid JSON in query file: {file_path}")
+        sys.exit(1)
 
 
 def process_query_file(mca: MasterControlAgent, file_path: str) -> List[Dict[str, Any]]:
@@ -152,48 +160,62 @@ def save_responses(responses: List[Dict[str, Any]], output_file: str):
         output_file: Path to the output file
     """
     logger.info(f"Saving responses to file: {output_file}")
-    with open(output_file, "w") as f:
-        json.dump(responses, f, indent=2)
-    logger.info(f"Saved {len(responses)} responses")
+    try:
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(os.path.abspath(output_file)), exist_ok=True)
+        
+        with open(output_file, "w") as f:
+            json.dump(responses, f, indent=2)
+        logger.info(f"Saved {len(responses)} responses")
+    except IOError as e:
+        logger.error(f"Error saving responses: {str(e)}")
+        sys.exit(1)
 
 
 def main():
     """Main CLI entry point."""
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Elementum DSA Application")
+    parser = argparse.ArgumentParser(description="Elementum DSA Command-Line Interface")
     parser.add_argument("--query", type=str, help="Query to process")
     parser.add_argument("--agent-id", type=str, help="Agent ID to use")
     parser.add_argument("--domain", type=str, help="Domain to filter by")
     parser.add_argument("--query-file", type=str, help="Path to query file")
     parser.add_argument("--output-file", type=str, help="Path to output file")
     parser.add_argument("--log-level", type=str, default="INFO", help="Logging level")
+    parser.add_argument("--list-agents", action="store_true", help="List available agents")
     args = parser.parse_args()
 
     # Set logging level
-    logging.getLogger().setLevel(getattr(logging, args.log_level.upper()))
-
     try:
-        # Create and initialize the Master Control Agent
-        mca = create_mca()
+        logging.getLogger().setLevel(getattr(logging, args.log_level.upper()))
+    except AttributeError:
+        logger.warning(f"Invalid log level: {args.log_level}. Using INFO.")
+        logging.getLogger().setLevel(logging.INFO)
 
-        # Process query file if specified
-        if args.query_file:
-            responses = process_query_file(mca, args.query_file)
-            if args.output_file:
-                save_responses(responses, args.output_file)
-            else:
-                print(json.dumps(responses, indent=2))
-        # Process single query if specified
-        elif args.query:
-            response = process_query(mca, args.query, args.agent_id, args.domain)
-            print(json.dumps(response, indent=2))
-        # Display usage information if no query specified
+    # Create and initialize the Master Control Agent
+    mca = create_mca()
+
+    # List available agents if requested
+    if args.list_agents:
+        print("Available agents:")
+        for agent_id, agent in mca.agents.items():
+            print(f"  - {agent_id} (Domain: {agent.domain})")
+        return
+
+    # Process query file if specified
+    if args.query_file:
+        responses = process_query_file(mca, args.query_file)
+        if args.output_file:
+            save_responses(responses, args.output_file)
         else:
-            parser.print_help()
-    except Exception as e:
-        logger.exception(f"Error: {str(e)}")
-        print(f"Error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+            print(json.dumps(responses, indent=2))
+    # Process single query if specified
+    elif args.query:
+        response = process_query(mca, args.query, args.agent_id, args.domain)
+        print(json.dumps(response, indent=2))
+    # Display usage information if no query specified
+    else:
+        parser.print_help()
 
 
 if __name__ == "__main__":
