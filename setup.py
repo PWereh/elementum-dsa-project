@@ -47,11 +47,11 @@ setup(
     },
     include_package_data=True,
     package_data={
-        "elementum_dsa": ["knowledge/schemas/*.json"],
+        "": ["knowledge/schemas/*.json"],
     },
     entry_points={
         "console_scripts": [
-            "elementum-dsa=app:main",
+            "elementum-dsa=elementum_dsa.cli:main",
         ],
     },
 )
